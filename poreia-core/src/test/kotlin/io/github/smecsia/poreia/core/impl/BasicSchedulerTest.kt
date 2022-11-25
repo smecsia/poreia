@@ -18,7 +18,6 @@ import java.lang.Thread.sleep
 import java.time.Duration
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.function.Consumer
 
 class BasicSchedulerTest {
     @Test
@@ -26,9 +25,9 @@ class BasicSchedulerTest {
         val repo = BasicRepoBuilder<Heartbeat>().build("test", Opts(maxLockWaitMs = 100))
         val lockKey = "TEST_LOCK_KEY"
         val schedulers = (1..2).map {
-                BasicScheduler("$it", repo, maxNoHBMs = 500, hbIntervalMs = 500, lockKey = lockKey)
-                    .also { sleep(300) }
-            }
+            BasicScheduler("$it", repo, maxNoHBMs = 500, hbIntervalMs = 500, lockKey = lockKey)
+                .also { sleep(300) }
+        }
         assertThat(schedulers[0].role, equalTo(PRIMARY))
         val seq100ms = AtomicInteger()
         val seq200ms = AtomicInteger()
