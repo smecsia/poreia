@@ -3,6 +3,9 @@ package io.github.smecsia.poreia.core.api.processing
 typealias StateInitializer<S> = () -> S
 typealias StateClosureFnc<S> = (String, S) -> Unit
 
+/**
+ * Base interface for state repositories
+ */
 interface Repository<S> : Locker {
     /**
      * Initializes new state for when it's empty

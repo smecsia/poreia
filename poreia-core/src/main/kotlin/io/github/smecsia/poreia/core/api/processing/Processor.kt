@@ -2,6 +2,9 @@ package io.github.smecsia.poreia.core.api.processing
 
 import io.github.smecsia.poreia.core.api.queue.QueueConsumer
 
+/**
+ * Base interface for processors
+ */
 interface Processor<M> {
     val name: String
 

@@ -2,6 +2,9 @@ package io.github.smecsia.poreia.core.api.processing
 
 import io.github.smecsia.poreia.core.error.LockWaitTimeoutException
 
+/**
+ * Base interface for locking-aware operations
+ */
 interface Locker {
     /**
      * Returns true if key is locked by current thread

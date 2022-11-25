@@ -2,6 +2,9 @@ package io.github.smecsia.poreia.core.api
 
 import java.util.concurrent.TimeUnit.MINUTES
 
+/**
+ * Global options allowing to configure behavior of the pipeline
+ */
 data class Opts(
     val maxQueueSize: Int = 1000000, // max size for the queue
     val consumers: Int = 1, // max count of queue consumer threads

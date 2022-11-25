@@ -2,6 +2,9 @@ package io.github.smecsia.poreia.core.api.queue
 
 typealias QueueConsumerCallback<M> = (M) -> Unit
 
+/**
+ * Queue consumer allowing to consume messages from the queue
+ */
 interface QueueConsumer<M> : Terminable {
     /**
      * Blocks until new message appears in queue
@@ -11,6 +14,9 @@ interface QueueConsumer<M> : Terminable {
     @Throws(InterruptedException::class)
     fun consume(callback: QueueConsumerCallback<M>)
 
+    /**
+     * Name of the queue the consumer is built for
+     */
     val queueName: String
 }
 

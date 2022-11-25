@@ -5,6 +5,9 @@ import io.github.smecsia.poreia.core.api.Opts
 import io.github.smecsia.poreia.core.api.queue.Queue
 import io.github.smecsia.poreia.core.api.serialize.ToBytesSerializer
 
+/**
+ * RabbitMQ implementation for the [Queue]
+ */
 class RabbitmqQueue<M> @JvmOverloads constructor(
     private val queueName: String,
     private val channel: Channel,

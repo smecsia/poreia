@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 import java.util.function.Consumer
 
 open class BasicProcessor<M>(
-    val pipeline: io.github.smecsia.poreia.core.Pipeline<M, *>,
+    val pipeline: Pipeline<M, *>,
     override val name: String,
     private val strategy: ProcessingStrategy<M>,
     private var filter: Filter<M>? = null,
@@ -87,7 +87,7 @@ open class BasicProcessor<M>(
 
         class Builder<M> : ProcessorBuilder<M> {
             override fun build(
-                pipeline: io.github.smecsia.poreia.core.Pipeline<M, *>,
+                pipeline: Pipeline<M, *>,
                 name: String,
                 strategy: ProcessingStrategy<M>,
                 filter: Filter<M>?,

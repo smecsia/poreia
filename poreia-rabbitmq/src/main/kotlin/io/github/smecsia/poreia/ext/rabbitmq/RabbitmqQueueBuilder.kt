@@ -8,6 +8,9 @@ import io.github.smecsia.poreia.core.api.queue.Queue
 import io.github.smecsia.poreia.core.api.queue.QueueBuilder
 import io.github.smecsia.poreia.core.api.serialize.ToBytesSerializer
 
+/**
+ * Queue builder for RabbitMQ queue provider
+ */
 class RabbitmqQueueBuilder<M>(
     connection: Connection,
     serializer: ToBytesSerializer<M>,

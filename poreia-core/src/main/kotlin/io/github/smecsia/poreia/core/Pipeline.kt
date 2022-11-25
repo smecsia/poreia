@@ -44,6 +44,11 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Main class of the framework, so-called "Pipeline".
+ * Holds the whole state of all objects operating on the pipeline. Allows to build up the routes and set-up
+ * queue consumers and producers.
+ */
 open class Pipeline<M, S>(
     val name: String,
 ) {
@@ -85,19 +90,19 @@ open class Pipeline<M, S>(
     @Synchronized
     fun start() {
         if (!started.get()) {
-            io.github.smecsia.poreia.core.Pipeline.Companion.LOG.info("[$name] Starting pipeline: \n $route")
+            LOG.info("[$name] Starting pipeline: \n $route")
             onStartCallbacks.forEach { it.invoke() }
             if (stateInit == null || stateClass == null) {
-                io.github.smecsia.poreia.core.Pipeline.Companion.LOG.warn("No state initializer / class found! Aggregators may not work normally")
+                LOG.warn("No state initializer / class found! Aggregators may not work normally")
             }
             scheduler?.start()
             consumers.clear()
             processors.values.forEach { p ->
                 val tCount = opts(p.name).consumers
-                io.github.smecsia.poreia.core.Pipeline.Companion.LOG.info("[$name][${p.name}] Starting $tCount consumers...")
+                LOG.info("[$name][${p.name}] Starting $tCount consumers...")
                 val tPool = threadPoolBuilder.build(tCount)
                 repeat(tCount) { idx ->
-                    io.github.smecsia.poreia.core.Pipeline.Companion.LOG.debug("[$name][${p.name}#$idx] Starting consumer...")
+                    LOG.debug("[$name][${p.name}#$idx] Starting consumer...")
                     val consumerName = "p$name-t${p.name}-c$idx"
                     tPool.submit {
                         while (!tPool.isShutdown()) {
@@ -106,15 +111,15 @@ open class Pipeline<M, S>(
                                 consumers.add(consumer)
                                 p.run(consumer, consumerName)
                             } catch (e: RejectedExecutionException) {
-                                io.github.smecsia.poreia.core.Pipeline.Companion.LOG.debug("[$name][${p.name}#$idx] Consumer exited due to thread pool shutdown: ${e.message}")
+                                LOG.debug("[$name][${p.name}#$idx] Consumer exited due to thread pool shutdown: ${e.message}")
                                 break
                             } catch (e: Exception) {
                                 if (tPool.isShutdown() || !started.get()) {
-                                    io.github.smecsia.poreia.core.Pipeline.Companion.LOG.debug("[$name][${p.name}#$idx] Consumer exited due to thread pool shutdown: ${e.message}")
+                                    LOG.debug("[$name][${p.name}#$idx] Consumer exited due to thread pool shutdown: ${e.message}")
                                     break
                                 }
                                 val delay = Random().nextInt(5000).toLong()
-                                io.github.smecsia.poreia.core.Pipeline.Companion.LOG.error(
+                                LOG.error(
                                     "[$name][${p.name}#$idx] Consumer exited with exception, restart in ${delay}ms",
                                     e,
                                 )
@@ -133,7 +138,7 @@ open class Pipeline<M, S>(
     @Synchronized
     fun stop() {
         if (started.get()) {
-            io.github.smecsia.poreia.core.Pipeline.Companion.LOG.info("[$name] Stopping pipeline")
+            LOG.info("[$name] Stopping pipeline")
             onStopCallbacks.forEach { it.invoke() }
             scheduler?.terminate()
             consumers.forEach { it.terminate() }
@@ -364,12 +369,12 @@ open class Pipeline<M, S>(
     }
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(io.github.smecsia.poreia.core.Pipeline::class.java)
+        private val LOG = LoggerFactory.getLogger(Pipeline::class.java)
 
-        fun <M, S> startPipeline(name: String = "pipeline", definition: io.github.smecsia.poreia.core.Pipeline<M, S>.() -> Unit): io.github.smecsia.poreia.core.Pipeline<M, S> =
-            io.github.smecsia.poreia.core.Pipeline<M, S>(name).also(definition).also { it.start() }
+        fun <M, S> startPipeline(name: String = "pipeline", definition: Pipeline<M, S>.() -> Unit): Pipeline<M, S> =
+            Pipeline<M, S>(name).also(definition).also { it.start() }
 
-        fun <M, S> pipeline(name: String = "pipeline", definition: io.github.smecsia.poreia.core.Pipeline<M, S>.() -> Unit): io.github.smecsia.poreia.core.Pipeline<M, S> =
-            io.github.smecsia.poreia.core.Pipeline<M, S>(name).also(definition)
+        fun <M, S> pipeline(name: String = "pipeline", definition: Pipeline<M, S>.() -> Unit): Pipeline<M, S> =
+            Pipeline<M, S>(name).also(definition)
     }
 }

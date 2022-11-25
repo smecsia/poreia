@@ -3,9 +3,12 @@ package io.github.smecsia.poreia.core.api.processing
 import io.github.smecsia.poreia.core.Pipeline
 import io.github.smecsia.poreia.core.api.Opts
 
+/**
+ * Builder for [Aggregator] instances
+ */
 interface AggregatorBuilder<M, S> {
     fun build(
-        pipeline: io.github.smecsia.poreia.core.Pipeline<M, S>,
+        pipeline: Pipeline<M, S>,
         name: String,
         strategy: AggregationStrategy<M, S>,
         key: AggregationKey<M>,
