@@ -27,7 +27,7 @@
     </developers>
     <scm>
         <connection>scm:git:git://github.com/smecsia/poreia.git</connection>
-        <developerConnection>scm:git:ssh://github.com:smecsia/poreia.git</developerConnection>
+        <developerConnection>scm:git:ssh://github.com/smecsia/poreia.git</developerConnection>
         <url>https://github.com/smecsia/poreia/tree/master</url>
     </scm>
 
@@ -231,7 +231,8 @@
                             <version>${ktlint.version}</version> <!-- optional -->
                             <editorConfigOverride> <!-- optional -->
                                 <ij_kotlin_allow_trailing_comma>true</ij_kotlin_allow_trailing_comma>
-                                <ij_kotlin_allow_trailing_comma_on_call_site>true</ij_kotlin_allow_trailing_comma_on_call_site>
+                                <ij_kotlin_allow_trailing_comma_on_call_site>true
+                                </ij_kotlin_allow_trailing_comma_on_call_site>
                             </editorConfigOverride>
                         </ktlint>
                     </kotlin>
@@ -245,7 +246,24 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <releaseProfiles>skipTestsForReleasePerform</releaseProfiles>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>skipTestsForReleasePerform</id>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
