@@ -25,40 +25,37 @@ class BasicSchedulerTest {
     fun testStartMasterAndSlave() {
         val repo = BasicRepoBuilder<Heartbeat>().build("test", Opts(maxLockWaitMs = 100))
         val lockKey = "TEST_LOCK_KEY"
-        val schedulers =
-            listOf("0", "1").map {
-                BasicScheduler(it, repo, maxNoHBMs = 500, hbIntervalMs = 500, lockKey = lockKey)
+        val schedulers = (1..2).map {
+                BasicScheduler("$it", repo, maxNoHBMs = 500, hbIntervalMs = 500, lockKey = lockKey)
                     .also { sleep(300) }
             }
-        assertThat(schedulers.first().role, equalTo(PRIMARY))
+        assertThat(schedulers[0].role, equalTo(PRIMARY))
         val seq100ms = AtomicInteger()
         val seq200ms = AtomicInteger()
-        schedulers.forEach(
-            Consumer { s: Scheduler ->
-                s.addJob(
-                    ScheduledJob(
-                        name = "global",
-                        frequency = Duration.ofMillis(100),
-                        task = { seq100ms.incrementAndGet() },
-                    ),
-                    global = true,
-                )
-                s.addJob(
-                    ScheduledJob(
-                        name = "local",
-                        frequency = Duration.ofMillis(200),
-                        task = { seq200ms.incrementAndGet() },
-                    ),
-                    global = false,
-                )
-                s.start()
-                sleep(100)
-            },
-        )
-        sleep(1500)
+        schedulers.forEach { s: Scheduler ->
+            s.addJob(
+                ScheduledJob(
+                    name = "global",
+                    frequency = Duration.ofMillis(100),
+                    task = { seq100ms.incrementAndGet() },
+                ),
+                global = true,
+            )
+            s.addJob(
+                ScheduledJob(
+                    name = "local",
+                    frequency = Duration.ofMillis(200),
+                    task = { seq200ms.incrementAndGet() },
+                ),
+                global = false,
+            )
+            s.start()
+            sleep(200)
+        }
+        sleep(1300)
         await().atMost(2, SECONDS).until({ seq100ms.get() }, allOf(greaterThan(10), lessThanOrEqualTo(20)))
         await().atMost(2, SECONDS).until({ seq200ms.get() }, allOf(greaterThan(10), lessThanOrEqualTo(20)))
-        assertThat(schedulers.first().role, equalTo(PRIMARY))
+        assertThat(schedulers[0].role, equalTo(PRIMARY))
         schedulers[0].apply {
             terminate()
             sleep(1000)
