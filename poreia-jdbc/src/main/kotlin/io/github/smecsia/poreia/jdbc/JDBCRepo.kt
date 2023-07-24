@@ -66,6 +66,10 @@ class JDBCRepo<S>(
         locking.forceUnlock(key)
     }
 
+    override fun forceUnlockAll() {
+        locking.forceUnlockAll()
+    }
+
     override fun set(key: String, value: S): S {
         dialect.put(tableName, key, connection, serializer.serialize(value))
         return value

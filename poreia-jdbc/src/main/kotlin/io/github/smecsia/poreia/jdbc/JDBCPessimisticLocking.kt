@@ -52,6 +52,10 @@ class JDBCPessimisticLocking(
         dialect.forceUnlock(tableName, key, connection)
     }
 
+    override fun forceUnlockAll() {
+        dialect.forceUnlockAll(tableName, connection)
+    }
+
     @Throws(InvalidLockOwnerException::class)
     override fun unlock(key: String) {
         try {

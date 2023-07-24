@@ -20,19 +20,19 @@ class ConcurrentHashMapRepository<S>(
     override fun lockAndGet(key: String): S? {
         lock(key)
         return get(key).also {
-            logger.trace("lockAndGet key '$key' value '$it")
+            logger.trace("lockAndGet key '{}' value '{}", key, it)
         }
     }
 
     override fun setAndUnlock(key: String, value: S): S {
-        logger.trace("setAndUnlock key '$key' value '$value'")
+        logger.trace("setAndUnlock key '{}' value '{}'", key, value)
         map[key] = value
         unlock(key)
         return value
     }
 
     override fun set(key: String, value: S): S {
-        logger.trace("put key '$key' value '$value")
+        logger.trace("put key '{}' value '{}", key, value)
         map[key] = value
         return value
     }

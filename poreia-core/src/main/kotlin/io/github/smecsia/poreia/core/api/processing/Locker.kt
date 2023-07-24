@@ -35,4 +35,9 @@ interface Locker {
      * Forcing unlock of the key
      */
     fun forceUnlock(key: String)
+
+    /**
+     * Forcing unlock of all keys
+     */
+    fun forceUnlockAll()
 }

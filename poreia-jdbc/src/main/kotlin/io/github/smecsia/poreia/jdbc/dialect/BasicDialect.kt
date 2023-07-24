@@ -30,6 +30,10 @@ open class BasicDialect : Dialect {
         conn.createStatement().execute(forceRemoveLockSQL(tableName, key))
     }
 
+    override fun forceUnlockAll(tableName: String, conn: Connection) {
+        conn.createStatement().execute(forceRemoveAllLocksSQL(tableName))
+    }
+
     @Throws(SQLException::class)
     override fun isLocked(tableName: String, key: String, conn: Connection): Boolean = conn.createStatement().let {
         it.execute("SELECT * FROM ${table(tableName)} WHERE ${field("key")}='$key'")
@@ -127,14 +131,19 @@ open class BasicDialect : Dialect {
             )
         """.trimIndent()
 
-    protected fun removeLockSQL(tableName: String, key: String): String =
+    protected open fun removeLockSQL(tableName: String, key: String): String =
         """
             DELETE FROM ${table(tableName)} WHERE ${field("key")}='$key' AND ${field("thread_id")}='${threadId()}'
         """.trimIndent()
 
-    protected fun forceRemoveLockSQL(tableName: String, key: String): String =
+    protected open fun forceRemoveLockSQL(tableName: String, key: String): String =
         """
             DELETE FROM ${table(tableName)} WHERE ${field("key")}='$key'
+        """.trimIndent()
+
+    protected open fun forceRemoveAllLocksSQL(tableName: String): String =
+        """
+            DELETE FROM ${table(tableName)}
         """.trimIndent()
 
     private val maxObjectSize = 30720

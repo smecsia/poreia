@@ -20,6 +20,9 @@ interface Dialect {
     fun forceUnlock(tableName: String, key: String, conn: Connection)
 
     @Throws(SQLException::class)
+    fun forceUnlockAll(tableName: String, conn: Connection)
+
+    @Throws(SQLException::class)
     fun isLocked(tableName: String, key: String, conn: Connection): Boolean
 
     @Throws(SQLException::class)

@@ -34,6 +34,16 @@ class PostgresDialect : BasicDialect() {
                 SET ${field("key")} = ?, ${field("object")} = ?
         """
 
+    override fun createLocksSQL(tableName: String): String =
+        """
+            CREATE TABLE IF NOT EXISTS ${table(tableName)} (
+              ${field("key")} VARCHAR(512),
+              ${field("locked_date")} TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              ${field("thread_id")} VARCHAR(256),
+              PRIMARY KEY (${field("key")})
+            )
+        """.trimIndent()
+
     @Throws(SQLException::class)
     override fun put(tableName: String, key: String, conn: Connection, bytes: ByteArray) {
         val statement = conn.prepareStatement(upsertSQL(tableName))

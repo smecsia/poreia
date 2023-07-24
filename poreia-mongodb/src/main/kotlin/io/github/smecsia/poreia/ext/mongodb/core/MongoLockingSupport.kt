@@ -76,6 +76,14 @@ class MongoLockingSupport(
         collection().deleteOne(byId(key))
     }
 
+    override fun forceUnlockAll() {
+        LOGGER.trace(
+            "Forcing unlock of all keys for threadId '{}'...",
+            threadId(),
+        )
+        collection().deleteMany(Document())
+    }
+
     override fun isLocked(key: String): Boolean {
         return collection().find(byId(key)).limit(1).iterator().hasNext()
     }

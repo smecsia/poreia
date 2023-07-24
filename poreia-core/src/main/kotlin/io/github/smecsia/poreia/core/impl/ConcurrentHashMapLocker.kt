@@ -27,6 +27,10 @@ class ConcurrentHashMapLocker(private val opts: Opts = Opts()) : Locker {
         locks.computeIfPresent(key) { _, pair -> pair.first.release(); null }
     }
 
+    override fun forceUnlockAll() {
+        locks.clear()
+    }
+
     private fun getLock(key: String) = locks.computeIfAbsent(key) {
         Pair(Semaphore(1), null)
     }.first
