@@ -52,6 +52,11 @@ interface Repository<S> : Locker {
     fun deleteAndUnlock(key: String)
 
     /**
+     * Forcing deleting key and unlocking it
+     */
+    fun forceDeleteAndUnlock(key: String)
+
+    /**
      * Clears repository from all the data
      */
     fun clear()

@@ -4,12 +4,14 @@ import io.github.smecsia.poreia.core.api.processing.Locker
 import io.github.smecsia.poreia.core.api.processing.Repository
 import io.github.smecsia.poreia.core.api.processing.StateInitializer
 import io.github.smecsia.poreia.core.api.serialize.ToBytesSerializer
+import io.github.smecsia.poreia.core.error.InvalidLockOwnerException
 import io.github.smecsia.poreia.core.error.LockWaitTimeoutException
 import io.github.smecsia.poreia.jdbc.dialect.BasicDialect
 import io.github.smecsia.poreia.jdbc.dialect.Dialect
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
+import java.sql.SQLException
 
 class JDBCRepo<S>(
     private val connection: Connection,
@@ -75,7 +77,17 @@ class JDBCRepo<S>(
         return value
     }
 
-    override fun deleteAndUnlock(key: String) = dialect.remove(tableName, key, connection)
+    @Throws(InvalidLockOwnerException::class)
+    override fun deleteAndUnlock(key: String) {
+        try {
+            dialect.tryUnlock(tableName, key, connection)
+        } catch (e: SQLException) {
+            throw InvalidLockOwnerException("Unable to unlock the key: $key", e)
+        }
+        dialect.remove(tableName, key, connection)
+    }
+
+    override fun forceDeleteAndUnlock(key: String) = dialect.remove(tableName, key, connection)
 
     override fun clear() = dialect.clear(tableName, connection)
 

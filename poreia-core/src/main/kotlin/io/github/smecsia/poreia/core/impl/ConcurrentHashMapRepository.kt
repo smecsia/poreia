@@ -50,6 +50,12 @@ class ConcurrentHashMapRepository<S>(
         unlock(key)
     }
 
+    override fun forceDeleteAndUnlock(key: String) {
+        logger.trace("Forcing deleting and unlocking '$key'...")
+        map.remove(key)
+        forceUnlock(key)
+    }
+
     override fun clear() {
         logger.trace("clearing the map...")
         map.clear()

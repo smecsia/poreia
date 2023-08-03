@@ -48,6 +48,12 @@ class MongoKVRepository<T : Any>(
         unlock(key)
     }
 
+    override fun forceDeleteAndUnlock(key: String) {
+        LOGGER.trace("Forcing removing value and unlocking key {} by thread {}", key, threadId())
+        delete(key)
+        forceUnlock(key)
+    }
+
     fun delete(key: String) {
         LOGGER.trace(
             "Removing value without unlocking key {} by thread {}",
